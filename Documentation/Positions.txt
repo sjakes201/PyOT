@@ -1,0 +1,24 @@
+FILE: Positions.py
+PURPOSE: Class that puts together options (groups of instances of Option class) to create more complex positions for analysis. Position is created,
+legs are added (if not provided in constructor), then Position is initialized. After initialization, stats are available. If you add legs to the
+position after initializing, just re-initialize: but the initial value will change.
+
+Constructor:
+
+__init__(legs = None, name = ""):
+	- legs is a list of tuples of Options and types, each formatted (Option, "CREDIT"/"DEBIT") credit = short, debit = long
+	- name is optional, some combinations of options have names, ex: "Bull Put Spread" or "Iron Condor" 
+
+Methods:
+
+add_leg(option_tuple):
+	- add legs to the position, tuples formatted in the same way they would have come in within "legs" in constructor
+
+initialize():
+	- generates stats for pos (max loss/gain, breakevens, etc)
+	- calculates initial value based on all legs in position
+	- assigns current ticker for whole position to first option in list legs (positions only span one ticker)
+
+refresh_value():
+	- updates value of position based on positions of all individual option legs. Does NOT update each leg: they need to be updated on their own 
+	  elsewhere

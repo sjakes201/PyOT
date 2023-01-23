@@ -1,0 +1,17 @@
+FILE: Market_Quotes.py
+PURPOSE: Module for getting all market data on stocks and options 
+
+Functions:
+
+valid_ticker(ticker):
+	- Returns True/False for whether the ticker (string) is a valid stock
+
+stock_price_live(ticker):
+	- returns live spot price for a stock via it's ticker (string)
+
+get_expirations(ticker):
+	- returns a list of datetime objects based on ticker (string)
+
+get_option_value(ticker, strike, expiration, type)
+	- Returns current price of option live
+	- ticker is string, strike is float, expiration is datetime object or properly formatted string ("MM/DD/YY"), type is "CALL" or "PUT"

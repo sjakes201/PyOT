@@ -1,0 +1,18 @@
+FILE: Option.py
+PURPOSE: This class creates option objects for individual options, to be used as positions or as legs in more complex positions.
+
+Constructor:
+
+__init__(ticker, strike, type, expir_date, initial_premium = None, create_date = None):
+	- ticker is string, ex "AAPL"
+	- strike is number (int or float)
+	- type is string "CALL" or "PUT"
+	- expir_date can be a datetime object or a string formatted "MM/DD/YY", it can accept both. Across the project datetime objects are always preferred and there is an attempt to 
+	  keep it a standard to always use datetime objects, then translate into the format needed last second
+	- initial_premium is optional to enter a premium other than the one created in the moment, in case for example the option was opened a while ago
+	- create_date is same format as expir_date, optional
+
+Methods:
+
+update_value():
+	- Updates and returns option value
