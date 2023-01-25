@@ -1,6 +1,6 @@
 from PyOT.Data.Market_Quotes import *
-from PyOT.Option import indiv_option
-from PyOT.Positions import Positions
+from PyOT.Option import *
+from PyOT.Position import Positions
 import datetime
 
 def test_valid_ticker():
@@ -34,29 +34,26 @@ def test_options_value():
     print("get_option_value returns correct value: " + str(not False in results))
 
 def test_indiv_option():
-    apple = indiv_option("AAPL", 142, "CALL", datetime.datetime(2023, 2, 3))
+    apple = Call("AAPL", 142, "CALL", datetime.datetime(2023, 2, 3))
     print(apple)
 
 
 
 def test_basic_position_creation():
-    appl1 = indiv_option("AAPL", 142, "CALL", datetime.datetime(2023, 2, 3))
-    appl2 = indiv_option("AAPL", 144, "CALL", datetime.datetime(2023, 2, 3))
-    appl3 = indiv_option("AAPL", 134, "PUT", datetime.datetime(2023, 2, 3))
-    appl4 = indiv_option("AAPL", 132, "PUT", datetime.datetime(2023, 2, 3))
-    iron_condor = Positions([(appl1, "CREDIT"), (appl2, "DEBIT"),(appl3, "CREDIT"), (appl4, "DEBIT")], "Iron Condor")
-    spread = Positions([(appl1, "CREDIT"), (appl2, "DEBIT")], "Spread")
-    spread.initialize()
-    print(spread.values["current value"])
+    appl1 = Call("AAPL", 148, datetime.datetime(2023, 2, 3), "SHORT")
+    appl2 = Call("AAPL", 150, datetime.datetime(2023, 2, 3), "LONG")
+    appl3 = Put("AAPL", 137, datetime.datetime(2023, 2, 3), "SHORT")
+    appl4 = Put("AAPL", 135, datetime.datetime(2023, 2, 3), "LONG")
+    pos = [appl1, appl2, appl3, appl4]
+    iron_condor = Positions("Iron Condor")
+    for p in pos:
+        iron_condor.add_leg(p)
     iron_condor.initialize()
     print(iron_condor)
-    print(iron_condor.stats)
-    iron_condor.refresh_value()
-    print(iron_condor)
-    iron_condor.refresh_value()
-    print(iron_condor)
-    iron_condor.refresh_value()
-    print(iron_condor)
+    print(iron_condor.values)
+    appl1.MANUAL_UPDATE(appl1.current_value - 0.3)
+    print(iron_condor.values)
+
 
 test_basic_position_creation()
 

@@ -3,10 +3,10 @@ PURPOSE: This class creates option objects for individual options, to be used as
 
 Constructor:
 
-__init__(ticker, strike, type, expir_date, initial_premium = None, create_date = None):
+__init__(ticker, strike, expir_date, type, initial_premium = None, create_date = None):
 	- ticker is string, ex "AAPL"
 	- strike is number (int or float)
-	- type is string "CALL" or "PUT"
+	- type is string "LONG" or "SHORT"
 	- expir_date can be a datetime object or a string formatted "MM/DD/YY", it can accept both. Across the project datetime objects are always preferred and there is an attempt to 
 	  keep it a standard to always use datetime objects, then translate into the format needed last second
 	- initial_premium is optional to enter a premium other than the one created in the moment, in case for example the option was opened a while ago
@@ -15,4 +15,4 @@ __init__(ticker, strike, type, expir_date, initial_premium = None, create_date =
 Methods:
 
 update_value():
-	- Updates and returns option value
+	- Updates value and sends signal to all positions that the option is in to update value

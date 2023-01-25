@@ -26,18 +26,14 @@ def get_expirations(ticker):
 
 
 def get_option_value(ticker, strike, expiration, type):
-    expir = expiration if isinstance(
-        expiration, str) else expiration.strftime("%d/%m/%Y")
-    if (type.upper() == "CALL"):
-        call_data = get_calls(ticker, expir)
-        strikes = list(call_data['Strike'])
-        strike_index = strikes.index(strike)
-        premium = call_data['Last Price'][strike_index]
-        return premium
-    if (type.upper() == "PUT"):
-        put_data = get_puts(ticker, expir)
-        strikes = list(put_data['Strike'])
-        strike_index = strikes.index(strike)
-        premium = put_data['Last Price'][strike_index]
-        return premium
-    return None
+    expir = expiration if isinstance(expiration, str) else expiration.strftime("%d/%m/%Y")
+    option_chain = None
+    if type.upper() == "CALL":
+        option_chain = get_calls(ticker, expir)
+    if type.upper() == "PUT":
+        option_chain = get_puts(ticker, expir)
+    strikes = list(option_chain['Strike'])
+    strike_index = strikes.index(strike)
+    premium = option_chain['Last Price'][strike_index]
+    return premium
+

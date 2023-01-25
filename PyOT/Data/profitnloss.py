@@ -3,12 +3,13 @@
 import numpy as np
 import math
 
-
-class Call:
-    def __init__(self, strike, premium, num_shares=100):
+#parent_pointer is the Call or Put from Option.py module that this option represents, used for syncing values. could instead generate unique IDS but this seems easier and could be used in future
+class Call_Option:
+    def __init__(self, strike, premium, parent_pointer, num_shares=100):
         self.strike = float(strike)
         self.premium = float(premium)
         self.num_shares = int(num_shares)
+        self.parent_pointer = parent_pointer
 
     def payoff(self, spot):
         return self.num_shares * (max(spot - self.strike, 0) - self.premium)
@@ -16,12 +17,16 @@ class Call:
     def break_even(self):
         return self.strike + self.premium
 
+    def update_premium(self, new_premium):
+        self.premium = float(new_premium)
 
-class Put:
-    def __init__(self, strike, premium, num_shares=100):
+
+class Put_Option:
+    def __init__(self, strike, premium, parent_pointer, num_shares=100):
         self.strike = float(strike)
         self.premium = float(premium)
         self.num_shares = int(num_shares)
+        self.parent_pointer = parent_pointer
 
     def payoff(self, spot):
         return self.num_shares * (max(self.strike - spot, 0) - self.premium)
@@ -29,17 +34,33 @@ class Put:
     def break_even(self):
         return self.strike - self.premium
 
+    def update_premium(self, new_premium):
+        self.premium = float(new_premium)
 
+
+
+#TODO: permit the removing of options so we can remove and re-add at different premiums, so I don't have to recreate a whole new strategy every time a premium updates
+#and I can properly use the observers to send only the new data and only update that one thing
 class Strategy:
     def __init__(self):
         self.longs = []
         self.shorts = []
 
-    def buy(self, contract):
+    #Buy To Open
+    def BTO(self, contract):
         self.longs.append(contract)
 
-    def sell(self, contract):
+    #Sell To Open
+    def STO(self, contract):
         self.shorts.append(contract)
+
+    #Buy To Close
+    def BTC(self, contract):
+        self.longs.remove(contract) #TODO: test this
+    
+    #Sell To Close
+    def STC(self, contract):
+        self.shorts.remove(contract) #TODO: test this
 
     def strikes(self):
         return sorted(list(set([c.strike for c in self.longs + self.shorts])))
