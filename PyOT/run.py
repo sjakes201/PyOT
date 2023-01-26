@@ -1,6 +1,8 @@
-
+import PyOT.Event_Scheduler as EH
 def run():
-    print("Running program now!")
+    print("Starting timed events!")
+    EH.start_jobs()
+
 
 
 if __name__ == '__main__':

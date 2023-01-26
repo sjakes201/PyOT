@@ -1,7 +1,7 @@
-# credit to nickdesaulniers at https://github.com/nickdesaulniers/profitnloss for this module
-# import matplotlib.pyplot as plt
+# modified version of https://github.com/nickdesaulniers/profitnloss
 import numpy as np
 import math
+import PyOT.Option as ops
 
 #parent_pointer is the Call or Put from Option.py module that this option represents, used for syncing values. could instead generate unique IDS but this seems easier and could be used in future
 class Call_Option:
@@ -38,9 +38,6 @@ class Put_Option:
         self.premium = float(new_premium)
 
 
-
-#TODO: permit the removing of options so we can remove and re-add at different premiums, so I don't have to recreate a whole new strategy every time a premium updates
-#and I can properly use the observers to send only the new data and only update that one thing
 class Strategy:
     def __init__(self):
         self.longs = []
@@ -54,13 +51,26 @@ class Strategy:
     def STO(self, contract):
         self.shorts.append(contract)
 
-    #Buy To Close
-    def BTC(self, contract):
-        self.longs.remove(contract) #TODO: test this
-    
-    #Sell To Close
-    def STC(self, contract):
-        self.shorts.remove(contract) #TODO: test this
+    #Need contract type (short/long) for longs or shorts, and direction (put/call) for put_option or call_option
+    def open(self, contract):
+        if contract.type == "LONG" and type(contract) == ops.Call:
+            self.longs.append(Call_Option(contract.strike, contract.current_value, contract))
+        elif contract.type == "SHORT" and type(contract) == ops.Call:
+            self.shorts.append(Call_Option(contract.strike, contract.current_value, contract))
+        elif contract.type == "LONG" and type(contract) == ops.Put:
+            self.longs.append(Put_Option(contract.strike, contract.current_value, contract))
+        elif contract.type == "SHORT" and type(contract) == ops.Put:
+            self.shorts.append(Put_Option(contract.strike, contract.current_value, contract))
+
+    def remove_via_parent(self, option):
+        for c in self.longs:
+            if c.parent_pointer == option:
+                self.longs.remove(c)
+                return
+        for c in self.shorts:
+            if c.parent_pointer == option:
+                self.shorts.remove(c)
+                return
 
     def strikes(self):
         return sorted(list(set([c.strike for c in self.longs + self.shorts])))

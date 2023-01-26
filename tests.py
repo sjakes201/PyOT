@@ -2,6 +2,8 @@ from PyOT.Data.Market_Quotes import *
 from PyOT.Option import *
 from PyOT.Position import Positions
 import datetime
+import PyOT.Event_Scheduler as EVENT
+import threading
 
 def test_valid_ticker():
     tickers = ["GOOG", "AAPL", "MSFT", "GOOGL", "AMZN", "SHW"]
@@ -40,25 +42,55 @@ def test_indiv_option():
 
 
 def test_basic_position_creation():
-    appl1 = Call("AAPL", 148, datetime.datetime(2023, 2, 3), "SHORT")
-    appl2 = Call("AAPL", 150, datetime.datetime(2023, 2, 3), "LONG")
-    appl3 = Put("AAPL", 137, datetime.datetime(2023, 2, 3), "SHORT")
-    appl4 = Put("AAPL", 135, datetime.datetime(2023, 2, 3), "LONG")
-    pos = [appl1, appl2, appl3, appl4]
+    op1 = Call("NOW", 480, datetime.datetime(2023, 2, 17), "SHORT")
+    op2 = Call("NOW", 490, datetime.datetime(2023, 2, 17), "LONG")
+    op3 = Put("NOW", 430, datetime.datetime(2023, 2, 17), "SHORT")
+    op4 = Put("NOW", 420, datetime.datetime(2023, 2, 17), "LONG")
+    pos = [op1,op2,op3,op4]
     iron_condor = Positions("Iron Condor")
     for p in pos:
         iron_condor.add_leg(p)
-    iron_condor.initialize()
     print(iron_condor)
+    # iron_condor.remove_leg(appl5)
+    # print(iron_condor)
     print(iron_condor.values)
-    appl1.MANUAL_UPDATE(appl1.current_value - 0.3)
-    print(iron_condor.values)
+    # # appl1.MANUAL_UPDATE(appl1.current_value - 0.3)
+    # # print(iron_condor.values)
+    print(iron_condor.legs)
+
+def test_update_mananger():
+    op1 = Call("SHOP", 50, datetime.datetime(2023, 2, 17), "SHORT")
+    op2 = Call("SHOP", 55, datetime.datetime(2023, 2, 17), "LONG")
+    op3 = Put("SHOP", 35, datetime.datetime(2023, 2, 17), "SHORT")
+    op4 = Put("SHOP", 30, datetime.datetime(2023, 2, 17), "LONG")
+    # op5 = Call("SHOP", 50, datetime.datetime(2023, 2, 17), "SHORT")
+    # op6 = Call("SHOP", 55, datetime.datetime(2023, 2, 17), "LONG")
+    # op7 = Put("SHOP", 35, datetime.datetime(2023, 2, 17), "SHORT")
+    # op8 = Put("SHOP", 30, datetime.datetime(2023, 2, 17), "LONG")
+    double_condor = Positions("Iron Condor")
+    ops = [op1,op2,op3,op4]
+    for o in ops:
+        double_condor.add_leg(o)
+    # print(double_condor)
+    # print(double_condor.values)
+    print("Test")
 
 
-test_basic_position_creation()
+op1 = Call("SHOP", 50, datetime.datetime(2023, 2, 17), "SHORT")
+op2 = Call("SHOP", 55, datetime.datetime(2023, 2, 17), "LONG")
+op3 = Put("SHOP", 35, datetime.datetime(2023, 2, 17), "SHORT")
+op4 = Put("SHOP", 30, datetime.datetime(2023, 2, 17), "LONG")
 
+EVENT.options_to_update.append(op1)
+EVENT.options_to_update.append(op2)
+EVENT.options_to_update.append(op3)
+EVENT.options_to_update.append(op4)
+best_pos = Positions("Iron Condor")
+best_pos.add_leg(op1)
+best_pos.add_leg(op2)
+best_pos.add_leg(op3)
+best_pos.add_leg(op4)
 
-# test_valid_ticker()
-# test_live_price()
-# test_options_value()
-# test_indiv_option()
+print(EVENT.options_to_update)
+EVENT.start_jobs()
+print("test after job start")
